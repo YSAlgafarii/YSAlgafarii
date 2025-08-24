@@ -30,9 +30,7 @@ Let’s talk business, travel, wellness, or anything that moves the world forwar
 
 <!-- Optionally add your social or professional links below -->
 <!--
-[LinkedIn](https://www.linkedin.com/in/your-profile)  
-[Website](https://yourwebsite.com)  
-[Twitter/X](https://twitter.com/algafarii)
+[Facebook](https://www.facebook.com/Algafariiofficial) 
 -->
 
 ---
