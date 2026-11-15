@@ -1,0 +1,17 @@
+{
+  "name": "Jungle Marble Shooter",
+  "short_name": "Jungle Marble",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#101d15",
+  "theme_color": "#17291d",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
