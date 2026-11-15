@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#092c22"><title>Jungle Marble Shooter</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08251d;color:#f4efd9;font-family:system-ui,-apple-system,Segoe UI,sans-serif;touch-action:manipulation}
+.app{height:100dvh;max-width:700px;margin:auto;display:flex;flex-direction:column;padding: max(10px,env(safe-area-inset-top)) 12px max(8px,env(safe-area-inset-bottom));gap:8px;background:radial-gradient(ellipse at 50% 45%,#174b38,#08251d 78%)}
+.head{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px}.eyebrow{font-size:10px;letter-spacing:.24em;color:#a9c6a7}.title{font-weight:900;font-size:clamp(20px,5vw,27px);line-height:1.05;color:#f5efd9}.build{font-size:10px;color:#bfd1b7;letter-spacing:.12em}
+.hud{display:grid;grid-template-columns:1fr 1fr 1.2fr;align-items:center;padding:9px 12px;border:1px solid #648773;border-radius:16px;background:#204936d9;box-shadow:inset 0 1px #ffffff18}
+.hlabel{font-size:10px;letter-spacing:.2em;color:#b8cbb4}.hval{font-size:25px;line-height:1.1;font-weight:900}.lives{text-align:right;color:#ff967e;letter-spacing:3px;font-size:22px}.progress{height:7px;border-radius:20px;background:#0a241c;overflow:hidden;margin-top:5px}.fill{height:100%;width:0;background:linear-gradient(90deg,#8bdc60,#ffdc75);transition:width .2s}
+.board{position:relative;flex:1;min-height:0;overflow:hidden;border-radius:20px;border:1px solid #315d48;background:#104531;box-shadow:0 10px 30px #0005}
+canvas{width:100%;height:100%;display:block;touch-action:none}
+.foot{display:flex;align-items:center;gap:8px;min-height:43px}.message{font-size:12px;color:#d9e3c9;flex:1;line-height:1.25}.btn{border:1px solid #9b8651;background:linear-gradient(#80633b,#493820);color:white;border-radius:11px;padding:9px 13px;font-weight:800;font-size:12px;min-height:40px}.hint{text-align:center;font-size:10px;color:#9eb79e}
+.overlay{position:absolute;inset:0;background:#041b14c9;display:none;align-items:center;justify-content:center;padding:22px;text-align:center}.overlay.show{display:flex}.dialog{max-width:310px;background:linear-gradient(#315b40,#163b2c);border:1px solid #bba56c;border-radius:20px;padding:22px;box-shadow:0 12px 35px #0008}.dialog h2{margin:0 0 8px;color:#ffe08a;font-size:26px}.dialog p{font-size:13px;line-height:1.5;color:#e9efd9}.dialog .btn{margin-top:8px;font-size:14px;padding:12px 25px}
+@media(min-width:600px){.app{padding:16px}.board{border-radius:22px}}
+</style></head><body><main class="app">
+<header class="head"><div><div class="eyebrow">CANOPY ARCADE</div><div class="title">Jungle Marble Shooter</div></div><div class="build">MOBILE PREVIEW</div></header>
+<section class="hud"><div><div class="hlabel">SCORE</div><div class="hval" id="score">0</div></div><div><div class="hlabel">BEST</div><div class="hval" id="best">0</div></div><div><div class="hlabel" style="text-align:right">STRIKES</div><div class="lives" id="lives">♥ ♥ ♥</div><div class="progress"><div class="fill" id="progress"></div></div></div></section>
+<section class="board"><canvas id="game" width="540" height="900" aria-label="Jungle marble shooter game"></canvas><div class="overlay show" id="overlay"><div class="dialog"><h2 id="ot">Jungle Marble</h2><p id="op">Aim with your finger and tap to fire. Match 3 or more marbles of the same colour before the chain reaches the temple.</p><button class="btn" id="start">▶ START GAME</button></div></div></section>
+<footer class="foot"><div class="message" id="msg">Ready to play?</div><button class="btn" id="swap">⇄ SWAP</button><button class="btn" id="pause">Ⅱ</button><button class="btn" id="restart">↻</button></footer><div class="hint">DRAG TO AIM · TAP TO SHOOT · SWAP TO CHANGE MARBLE</div>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id),canvas=$('game'),ctx=canvas.getContext('2d'),W=540,H=900;
+const colors=['#f05b50','#4ba8e8','#5bc878','#f2ca59','#b17be8'],dark=['#8e302b','#205b8a','#28683c','#926d29','#68428b'];
+const rand=()=>Math.floor(Math.random()*5),R=15,shooter={x:270,y:790};
+const way=[[-35,120],[72,120],[112,145],[112,315],[130,355],[205,405],[340,405],[390,445],[390,565],[360,610],[285,675],[155,675],[105,710],[78,760],[78,925]];
+function catmull(points,steps=24){let out=[];for(let i=0;i<points.length-1;i++){let p0=points[Math.max(0,i-1)],p1=points[i],p2=points[i+1],p3=points[Math.min(points.length-1,i+2)];for(let j=0;j<steps;j++){let t=j/steps,t2=t*t,t3=t2*t;out.push({x:.5*((2*p1[0])+(-p0[0]+p2[0])*t+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3),y:.5*((2*p1[1])+(-p0[1]+p2[1])*t+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3)});}out.push({x:points.at(-1)[0],y:points.at(-1)[1]});return out}
+const path=catmull(way),ds=[0];for(let i=1;i<path.length;i++)ds[i]=ds[i-1]+Math.hypot(path[i].x-path[i-1].x,path[i].y-path[i-1].y);const total=ds.at(-1);
+function at(s){s=Math.max(0,Math.min(total,s));let lo=0,hi=ds.length-1;while(lo<hi){let m=(lo+hi)>>1;if(ds[m]<s)lo=m+1;else hi=m}return path[lo]}
+let balls=[],shots=[],score=0,best=Number(localStorage.getItem('jms-best')||0),lives=3,loaded=0,next=1,aim={x:400,y:300},state='menu',paused=false,level=1,spawnLeft=18,spawnClock=0,last=0;
+$('best').textContent=best;
+function say(t){$('msg').textContent=t}
+function hud(){$('score').textContent=score;$('best').textContent=best;$('lives').textContent='♥ '.repeat(lives)+'♡ '.repeat(3-lives);$('progress').style.width=Math.min(100,balls.length/Math.max(1,spawnLeft+balls.length)*100)+'%'}
+function show(title,desc,button){$('ot').textContent=title;$('op').textContent=desc;$('start').textContent=button;$('overlay').classList.add('show')}
+function start(){balls=[];shots=[];score=0;lives=3;level=1;loaded=rand();next=rand();spawnLeft=18;spawnClock=0;paused=false;state='playing';for(let i=0;i<11;i++)balls.push({s:i*33,c:rand()});$('overlay').classList.remove('show');$('pause').textContent='Ⅱ';say('Match 3 or more marbles!');hud()}
+function marble(x,y,k,r=R){ctx.save();ctx.shadowColor='#b9f7d1aa';ctx.shadowBlur=9;let grad=ctx.createRadialGradient(x-r*.38,y-r*.42,1,x,y,r);grad.addColorStop(0,'#fff');grad.addColorStop(.19,colors[k]);grad.addColorStop(1,dark[k]);ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#ffffff70';ctx.lineWidth=1.3;ctx.stroke();ctx.restore()}
+function shoot(x,y){if(state!=='playing'||paused)return;let a=Math.atan2(y-shooter.y,x-shooter.x);shots.push({x:shooter.x+Math.cos(a)*38,y:shooter.y+Math.sin(a)*38,vx:Math.cos(a)*650,vy:Math.sin(a)*650,c:loaded});loaded=next;next=rand()}
+function doMatch(i){let k=balls[i].c,l=i,r=i;while(l>0&&balls[l-1].c===k)l--;while(r<balls.length-1&&balls[r+1].c===k)r++;let n=r-l+1;if(n>=3){balls.splice(l,n);score+=n*100;best=Math.max(best,score);localStorage.setItem('jms-best',best);say(n>=4?'✨ BIG COMBO!':'💥 NICE MATCH!')}else say('Keep going — find a colour match!')}
+function update(dt){if(state!=='playing'||paused)return;if(spawnLeft>0){spawnClock+=dt;if(spawnClock>1.35){spawnClock=0;balls.push({s:0,c:rand()});spawnLeft--}}
+for(let i=0;i<balls.length;i++){balls[i].s+=23+level*2;if(i&&balls[i].s<balls[i-1].s+31)balls[i].s=balls[i-1].s+31}
+for(let i=shots.length-1;i>=0;i--){let q=shots[i];q.x+=q.vx*dt;q.y+=q.vy*dt;let hit=-1;for(let j=0;j<balls.length;j++){let p=at(balls[j].s);if(Math.hypot(p.x-q.x,p.y-q.y)<R*2){hit=j;break}}if(hit>=0){let s=balls[hit].s;balls.splice(hit,0,{s:s-1,c:q.c});for(let j=hit+1;j<balls.length;j++)balls[j].s+=31;doMatch(hit);shots.splice(i,1)}else if(q.x< -40||q.x>W+40||q.y< -40||q.y>H+40)shots.splice(i,1)}
+if(balls.some(b=>b.s>=total-8)){lives--;balls=balls.filter(b=>b.s<total-8);if(lives<=0){state='over';show('GAME OVER','Your score: '+score+'. Try again and stop the marble chain!','↻ PLAY AGAIN')}else say('The chain escaped! One strike lost.')}
+if(spawnLeft===0&&balls.length===0){level++;spawnLeft=18+level*3;for(let i=0;i<Math.min(8,level+2);i++)balls.push({s:i*32,c:rand()});say('🏆 LEVEL '+level+' — faster chain!')}
+hud()}
+function draw(){ctx.clearRect(0,0,W,H);let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#14513c');bg.addColorStop(1,'#073b2c');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+for(let i=0;i<38;i++){let x=(i*139+30)%W,y=(i*197+25)%H;ctx.save();ctx.translate(x,y);ctx.rotate(i*.73);ctx.fillStyle=i%2?'#8acb7920':'#c5dc7420';ctx.beginPath();ctx.ellipse(0,0,7+i%8,20+i%9,0,0,7);ctx.fill();ctx.restore()}
+ctx.beginPath();path.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=53;ctx.strokeStyle='#102c21';ctx.stroke();ctx.lineWidth=43;ctx.strokeStyle='#a27a4b';ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='#d1a66b';ctx.setLineDash([4,13]);ctx.stroke();ctx.setLineDash([]);
+let end=at(total);ctx.fillStyle='#e8c879';ctx.beginPath();ctx.arc(end.x,end.y,25,0,7);ctx.fill();ctx.fillStyle='#20170f';ctx.beginPath();ctx.arc(end.x,end.y,17,0,7);ctx.fill();
+balls.forEach(b=>{let p=at(b.s);marble(p.x,p.y,b.c)});
+ctx.fillStyle='#173d2c';ctx.beginPath();ctx.arc(shooter.x,shooter.y,49,0,7);ctx.fill();ctx.strokeStyle='#bba66b';ctx.lineWidth=6;ctx.stroke();ctx.fillStyle='#58a64d';ctx.beginPath();ctx.arc(shooter.x,shooter.y,39,0,7);ctx.fill();
+ctx.fillStyle='#34743b';ctx.beginPath();ctx.ellipse(shooter.x-17,shooter.y-24,17,20,-.3,0,7);ctx.ellipse(shooter.x+17,shooter.y-24,17,20,.3,0,7);ctx.fill();ctx.fillStyle='white';ctx.beginPath();ctx.arc(shooter.x-17,shooter.y-26,10,0,7);ctx.arc(shooter.x+17,shooter.y-26,10,0,7);ctx.fill();ctx.fillStyle='#15271c';ctx.beginPath();ctx.arc(shooter.x-14,shooter.y-25,4,0,7);ctx.arc(shooter.x+20,shooter.y-25,4,0,7);ctx.fill();
+let a=Math.atan2(aim.y-shooter.y,aim.x-shooter.x);ctx.save();ctx.translate(shooter.x,shooter.y);ctx.rotate(a);ctx.fillStyle='#c1df83';ctx.beginPath();ctx.roundRect(22,-10,44,20,8);ctx.fill();ctx.restore();marble(shooter.x+Math.cos(a)*39,shooter.y+Math.sin(a)*39,loaded,13);marble(shooter.x+68,shooter.y+62,next,10);ctx.fillStyle='#e5efdb';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('NEXT',shooter.x+68,shooter.y+84);
+shots.forEach(q=>marble(q.x,q.y,q.c,12));if(paused){ctx.fillStyle='#00170f99';ctx.fillRect(0,0,W,H);ctx.fillStyle='white';ctx.font='bold 36px system-ui';ctx.textAlign='center';ctx.fillText('PAUSED',W/2,H/2)}}
+function loop(t){let dt=Math.min((t-last)/1000,.04)||0;last=t;update(dt);draw();requestAnimationFrame(loop)}
+function point(e){let r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+canvas.addEventListener('pointermove',e=>aim=point(e));canvas.addEventListener('pointerdown',e=>{e.preventDefault();let p=point(e);aim=p;shoot(p.x,p.y)});
+$('start').onclick=start;$('restart').onclick=start;$('swap').onclick=()=>{if(state==='playing'&&!paused)[loaded,next]=[next,loaded]};$('pause').onclick=()=>{if(state!=='playing')return;paused=!paused;$('pause').textContent=paused?'▶':'Ⅱ';say(paused?'Game paused':'Game resumed')};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing'&&!paused){paused=true;$('pause').textContent='▶'}});
+hud();requestAnimationFrame(loop);
+})();
+</script></body></html>
