@@ -4,6 +4,34 @@
 <title>Jungle Marble Shooter</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101d15;color:#fff;font-family:system-ui}body{display:flex;justify-content:center;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}.app{width:100%;max-width:900px;height:100%;display:flex;flex-direction:column;padding:10px;gap:8px;background:linear-gradient(160deg,#263c29,#111d16)}header,.stats,.bottom,.actions{display:flex;align-items:center;justify-content:space-between;gap:9px}header{min-height:45px}.brand{font-weight:900;color:#f4ca69;font-size:clamp(16px,4vw,24px);white-space:nowrap}.stats{gap:clamp(7px,2vw,20px)}.stat{text-align:center;font-size:9px;color:#c8d4bc}.stat b{display:block;font-size:clamp(15px,3.8vw,20px);color:white}.board{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;border:2px solid #8b774b;border-radius:14px;background:#1b2c20}canvas{width:100%;height:100%;object-fit:contain;touch-action:none}.btn{border:1px solid #a58a50;background:linear-gradient(#725b32,#45371f);color:white;border-radius:10px;font-weight:800;min-height:40px;padding:7px 12px}.icon{font-size:18px;min-width:40px}.bottom{min-height:42px}#msg{font-size:12px;color:#eadcae;flex:1}.hint{text-align:center;color:#aebca9;font-size:10px}.overlay{position:absolute;inset:0;background:#061009c9;display:none;align-items:center;justify-content:center;text-align:center;padding:20px}.overlay.show{display:flex}.dialog{max-width:330px;background:linear-gradient(#425638,#1c2b20);border:2px solid #c5a65b;border-radius:18px;padding:22px}.dialog h2{margin:0 0 8px;color:#ffdc7c}.dialog p{font-size:14px;line-height:1.4}.dialog button{margin-top:8px}@media(orientation:landscape) and (max-height:520px){.app{padding:4px;gap:4px}.hint{display:none}.brand{font-size:16px}.stat{font-size:8px}.stat b{font-size:14px}.btn{min-height:30px;padding:4px 8px}}
+
+/* Premium hybrid art direction */
+:root{color-scheme:dark}
+html,body{background:#07140f}
+body{background:radial-gradient(ellipse at 50% 8%,#36563b 0,#14271c 48%,#07110d 100%);font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif}
+.app{max-width:980px;padding:clamp(8px,2vw,18px);gap:clamp(8px,1.5vh,14px);background:linear-gradient(145deg,#263d2b99,#0b1912ee);border-inline:1px solid #b89a5940;box-shadow:0 0 70px #0009}
+header{padding:7px 12px;border:1px solid #d7bd7655;border-radius:16px;background:linear-gradient(110deg,#344b32ed,#17271de8);box-shadow:inset 0 1px #ffffff24,0 8px 22px #0005}
+.brand{letter-spacing:.035em;text-shadow:0 2px 12px #e6b95755;color:#ffe09a}
+.stats{gap:clamp(10px,2.5vw,28px)}
+.stat{letter-spacing:.13em;font-weight:800;color:#c7d5bd}
+.stat b{font-variant-numeric:tabular-nums;text-shadow:0 2px 10px #fff3}
+.board{border:3px solid #b99a5b;border-radius:20px;background:radial-gradient(ellipse at 50% 45%,#60784a,#203827 72%,#101d15);box-shadow:inset 0 0 0 3px #382e1d,inset 0 0 55px #07130c,0 16px 34px #0008}
+canvas{filter:saturate(1.12) contrast(1.04)}
+.btn{position:relative;overflow:hidden;border:1px solid #e0c17a;background:linear-gradient(180deg,#9a7940,#5d4728 55%,#3a2b1b);box-shadow:inset 0 1px #fff5,0 4px 12px #0005;color:#fff3d4;text-shadow:0 1px #0008;transition:transform .12s,filter .12s}
+.btn:active{transform:translateY(2px) scale(.98);filter:brightness(1.2)}
+.btn.icon{font-size:20px;border-radius:12px}
+.bottom{padding:9px 12px;border:1px solid #d0b16b44;border-radius:15px;background:linear-gradient(100deg,#1c3022,#101e16);box-shadow:inset 0 1px #fff1}
+#msg{font-weight:700;color:#f5d994;text-shadow:0 1px 9px #e6b95733}
+.hint{letter-spacing:.035em;color:#c1d0b8;text-shadow:0 2px 6px #000}
+.overlay{background:radial-gradient(ellipse at center,#102015c9,#030a06ed);backdrop-filter:blur(5px)}
+.dialog{background:linear-gradient(145deg,#536c43,#263b2a 58%,#14251a);border:2px solid #d4b66d;border-radius:22px;box-shadow:0 22px 60px #000b,inset 0 1px #ffffff30;padding:clamp(22px,5vw,34px)}
+.dialog h2{font-size:clamp(25px,6vw,36px);letter-spacing:.02em;text-shadow:0 3px 18px #f3c65c55}
+.dialog p{color:#e0e8d5;line-height:1.55}
+.dialog button{min-width:150px;min-height:48px;font-size:15px}
+@media(hover:hover){.btn:hover{filter:brightness(1.16)}}
+@media(orientation:landscape) and (max-height:520px){.app{padding:5px 9px}.board{border-radius:14px}header,.bottom{border-radius:11px}}
+@media(prefers-reduced-motion:no-preference){.dialog{animation:arrive .35s cubic-bezier(.2,.8,.2,1)}@keyframes arrive{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}}
+
 </style></head><body><main class="app">
 <header><div class="brand">🐸 Jungle Marble</div><div class="stats"><div class="stat">SCORE<b id="score">0</b></div><div class="stat">LEVEL<b id="level">1</b></div><div class="stat">LIVES<b id="lives">♥ ♥ ♥</b></div></div><button class="btn icon" id="pause">Ⅱ</button></header>
 <section class="board"><canvas id="game" width="800" height="650" aria-label="Marble shooter game"></canvas><div class="overlay show" id="overlay"><div class="dialog"><h2 id="ot">Jungle Marble</h2><p id="op">Aim with your finger and tap to shoot. Match 3 or more marbles before the chain reaches the temple hole.</p><button class="btn" id="start">▶ Play</button></div></div></section>
