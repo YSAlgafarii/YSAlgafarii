@@ -1,0 +1,44 @@
+name: Publish Jungle Marble preview
+
+on:
+  push:
+    branches:
+      - jungle-marble-preview
+    paths:
+      - "games/jungle-marble/**"
+      - ".github/workflows/jungle-marble-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: jungle-marble-pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out preview branch
+        uses: actions/checkout@v4
+
+      - name: Prepare static game site
+        run: |
+          mkdir -p _site
+          cp games/jungle-marble/index.html _site/index.html
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
