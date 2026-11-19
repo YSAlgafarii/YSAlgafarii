@@ -28,6 +28,9 @@ jobs:
       - name: Check out preview branch
         uses: actions/checkout@v4
 
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
       - name: Prepare static game site
         run: |
           mkdir -p _site
