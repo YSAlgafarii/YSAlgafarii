@@ -43,4 +43,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-# Retry publishing after the github-pages environment branch rule was updated.
+# Publish the latest full-screen mobile gameplay improvements.
